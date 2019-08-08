@@ -4,7 +4,8 @@ import pandas as pd
 import praw
 
 # discord vars
-token = 'XXXX'
+token = 'NjA4NTI3MDMxNjMzNzA3MDA5.XUpdJw.s53o8ZwGpmLAgKYVYfyejQnZ93I'
+# add link: https://discordapp.com/api/oauth2/authorize?client_id=608527031633707009&permissions=0&scope=bot
 
 # reddit vars
 clid = 'xn0ad2KiBrq6xg'
@@ -45,8 +46,8 @@ class ScrapeKey():
 
 # creates iterator of post URLs
 class postIter():
-    def __init__(self, searchKey, subname):
-        self.redditScrape = ScrapeKey(searchKey, subname)
+    def __init__(self, searchKey, subname, imageHost):
+        self.redditScrape = ScrapeKey(searchKey, subname, imageHost)
         self.postsFormatted = []
 
     # formats scraped posts
@@ -66,6 +67,7 @@ class postIter():
     def getPostLen(self):
         return len(self.postsFormatted)
 
+    # returns iterator of posts
     def getPostIter(self):
         return iter(self.postsFormatted)
 
@@ -73,6 +75,9 @@ class postIter():
 client = commands.Bot(command_prefix='!')
 client.remove_command('help')
 sub = 'all'
+img = 'i.redd.it'
+
+helpMsg = "rsearch: Searches for top posts/images in current subreddit - default is r/all\nrsub: Switches search subreddit to inputted name - no argument switches to r/all\nrimg:switches image provider to search by - no argument switches to i.redd.it\nrget: Gets next post found by rsearch - rsearch must be called before"
 
 @client.event
 async def on_ready():
@@ -82,13 +87,13 @@ async def on_ready():
 # help message
 @client.command()
 async def help():
-    await client.say("rsearch: Searches for top posts/images in current subreddit - default is r/all\nrsub: Switches search subreddit to inputted name - no argument switches to r/all\nrget: Gets next post found by rsearch - rsearch must be called before")
+    await client.say(helpMsg)
 
 # searches for top posts in current subreddit with keyword
 @client.command()
 async def rsearch(*, arg):
     global postStack
-    postIterTest = postIter(arg, sub)
+    postIterTest = postIter(arg, sub, img)
     postIterTest.formatPosts()
     postIterTest.makePostIter()
     if postIterTest.getPostLen() <= 0 :
@@ -103,6 +108,13 @@ async def rsub(arg = 'all'):
     global sub
     sub = arg
     await client.say("Now searching from: r/" + sub)
+
+# switches image provider to scrape from
+@client.command()
+async def rimg(arg = 'i.redd.it'):
+    global img
+    img = arg
+    await client.say("Now searching for posts with images from: " + img)
 
 # gets next title/url pair in stack of posts scraped
 @client.command()
