@@ -48,7 +48,6 @@ class ScrapeKey():
 class postIter():
     def __init__(self, searchKey, subname, imageHost):
         self.redditScrape = ScrapeKey(searchKey, subname, imageHost)
-        self.postsFormatted = []
 
     # formats scraped posts
     def formatPosts(self):
@@ -56,50 +55,66 @@ class postIter():
         self.postsRaw = self.redditScrape.getPosts()
         self.postsData = pd.DataFrame(self.postsRaw)
 
-    # makes post data iterator
+    # makes lists of post titles and image urls
     def makePostIter(self):
         self.titleList = self.postsData['title'].tolist()
         self.urlList = self.postsData['url'].tolist()
-        for postIndex in range(0,len(self.urlList)):
-            self.postsFormatted.append(self.titleList[postIndex] + '\n' + self.urlList[postIndex])
 
     # returns number of posts scraped
     def getPostLen(self):
-        return len(self.postsFormatted)
+        return len(self.urlList)
 
-    # returns iterator of posts
-    def getPostIter(self):
-        return iter(self.postsFormatted)
+    # returns iterator of titles
+    def getTitle(self):
+        return iter(self.titleList)
 
-# creates bot and sets default sub to search from
+    # returns iterator of urls
+    def getUrl(self):
+        return iter(self.urlList)
+
+# creates bot and sets default subreddit to search from
 client = commands.Bot(command_prefix='!')
 client.remove_command('help')
 sub = 'all'
 img = 'i.redd.it'
 
-helpMsg = "rsearch: Searches for top posts/images in current subreddit - default is r/all\nrsub: Switches search subreddit to inputted name - no argument switches to r/all\nrimg:switches image provider to search by - no argument switches to i.redd.it\nrget: Gets next post found by rsearch - rsearch must be called before"
 
 @client.event
 async def on_ready():
     print("The bot is ready!")
     await client.change_presence(game=discord.Game(name="Going Brazy"))
 
-# help message
-@client.command()
+# help message with embed
+@client.command(pass_context=True)
 async def help():
-    await client.say(helpMsg)
+
+    helpEmbed = discord.Embed(
+
+        colour = discord.Colour.green()
+
+    )
+    helpEmbed.set_author(name = "Help")
+    helpEmbed.add_field(name = "!rsearch", value="Searches for top posts/images in current subreddit - default is r/all", inline=False)
+    helpEmbed.add_field(name = "!rget", value="Gets next post found by rsearch - rsearch must be called before", inline=False)
+    helpEmbed.add_field(name = "!rsub", value="Switches search subreddit to inputted name - no argument switches to r/all", inline=False)
+    helpEmbed.add_field(name = "!rimg", value="Switches image provider to search by - no argument switches to i.redd.it", inline=False)
+
+    await client.say(embed=helpEmbed)
 
 # searches for top posts in current subreddit with keyword
 @client.command()
 async def rsearch(*, arg):
     global postStack
+    global titleStack
+    global urlStack
     postIterTest = postIter(arg, sub, img)
     postIterTest.formatPosts()
     postIterTest.makePostIter()
     if postIterTest.getPostLen() <= 0 :
         await client.say("No posts found")
     else:
-        postStack = postIterTest.getPostIter()
+        titleStack = postIterTest.getTitle()
+        urlStack = postIterTest.getUrl()
         await client.say("Posts found")
 
 # switches subreddit to scrape from
@@ -116,11 +131,16 @@ async def rimg(arg = 'i.redd.it'):
     img = arg
     await client.say("Now searching for posts with images from: " + img)
 
-# gets next title/url pair in stack of posts scraped
+# gets next title/url pair in stack of posts scraped using discord embed
 @client.command()
 async def rget():
     try:
-        await client.say(next(postStack))
+        postEmbed = discord.Embed(
+            color=discord.Colour.orange()
+        )
+        postEmbed.set_author(name=next(titleStack))
+        postEmbed.set_image(url=next(urlStack))
+        await client.say(embed=postEmbed)
     except StopIteration:
         await client.say("Reached end of posts")
     except NameError:
