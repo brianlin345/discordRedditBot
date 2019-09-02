@@ -1,5 +1,5 @@
 # discordRedditBot
-This is a discord bot made to scrape reddit posts with images. This project was created in Python with the PRAW Reddit API Wrapper and discord.py Discord API Wrapper.
+This is a discord bot made to scrape reddit posts that include images. This project was created in Python with the PRAW Reddit API Wrapper and discord.py Discord API Wrapper.
 
 ## Bot Link
 
