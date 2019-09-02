@@ -4,7 +4,7 @@ import pandas as pd
 import praw
 
 # discord vars
-token = 'XXX'
+token = 'XXXX'
 # add link: https://discordapp.com/api/oauth2/authorize?client_id=608527031633707009&permissions=0&scope=bot
 
 # reddit vars
