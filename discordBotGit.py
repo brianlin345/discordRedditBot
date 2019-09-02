@@ -4,13 +4,13 @@ import pandas as pd
 import praw
 
 # discord vars
-token = 'NjA4NTI3MDMxNjMzNzA3MDA5.XUpdJw.s53o8ZwGpmLAgKYVYfyejQnZ93I'
+token = 'XXX'
 # add link: https://discordapp.com/api/oauth2/authorize?client_id=608527031633707009&permissions=0&scope=bot
 
 # reddit vars
-clid = 'xn0ad2KiBrq6xg'
+clid = 'XXXX'
 clsecret = 'XXXX'
-app_name = 'redditScrape'
+app_name = 'XXXX'
 acc_user = 'XXXX'
 acc_pass = 'XXXX'
 
