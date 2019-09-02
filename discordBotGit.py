@@ -82,7 +82,7 @@ img = 'i.redd.it'
 @client.event
 async def on_ready():
     print("The bot is ready!")
-    await client.change_presence(game=discord.Game(name="Going Brazy"))
+    await client.change_presence(game=discord.Game(name="No Current Search"))
 
 # help message with embed
 @client.command(pass_context=True)
@@ -107,6 +107,8 @@ async def rsearch(*, arg):
     global postStack
     global titleStack
     global urlStack
+    searchStatus = "Current Search: {}".format(arg)
+    await client.change_presence(game = discord.Game(name = searchStatus))
     postIterTest = postIter(arg, sub, img)
     postIterTest.formatPosts()
     postIterTest.makePostIter()
